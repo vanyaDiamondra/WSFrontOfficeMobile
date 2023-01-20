@@ -39,7 +39,9 @@ public class MiseEnchereController {
 
     @RequestMapping("/addMise")
     @PostMapping
-    public void createMiseEnchere(@RequestBody MiseEnchere e) throws Exception{
+    public ResponseEntity<DataResponse> createMiseEnchere(@RequestBody MiseEnchere e) throws Exception{
+        System.out.println("rrrrr");
+        DataResponse dr = new DataResponse();
         Connection conn = ConnectionPostgresSQL.getconnect();
         MiseEnchereService service = new MiseEnchereService();
         Enchere enchere = new Enchere(e.getEnchereID());
@@ -47,13 +49,18 @@ public class MiseEnchereController {
 
         try {
             service.newMiseEnchere(conn, enchere, e, miseEnchereRepository);
+            dr.setStatus("200");
+            dr.setStatus("Mise insérer");
         }
         catch (Exception ex){
-            throw ex;
+            System.out.println("Exception "+ex.getMessage());
+            dr.setStatus("500");
+            dr.setData(ex.getMessage());
         }
         finally {
             conn.close();
         }
+        return ResponseEntity.accepted().body(dr);
     }
 
     @RequestMapping("/historiqueEnchere")

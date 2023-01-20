@@ -72,18 +72,24 @@ public class EnchereController {
     }
 
     @PostMapping
-    public ResponseEntity<DataResponse> createEnchere(@RequestBody Enchere e) throws Exception {
+    public ResponseEntity<DataResponse> createEnchere(@RequestBody Enchere e) {
         DataResponse dr = new DataResponse();
         enchereService = getService();
-        Connection conn = ConnectionPostgresSQL.getconnect();
+        try{
+            Connection conn = ConnectionPostgresSQL.getconnect();
 
-        int idEnchere = enchereService.createEnchere(e,conn);
-        e.setId(idEnchere);
-        e = (Enchere) e.find(conn);
-        dr.setData(e);
-        dr.setStatus("200");
+            int idEnchere = enchereService.createEnchere(e,conn);
+            e.setId(idEnchere);
+            e = (Enchere) e.find(conn);
+            dr.setData(e);
+            dr.setStatus("200");
 
-        conn.close();
+            conn.close();
+        }
+        catch (Exception ex){
+            dr.setStatus("500");
+            dr.setData(ex.getMessage());
+        }
         return ResponseEntity.accepted().body(dr);
     }
 
